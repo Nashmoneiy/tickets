@@ -94,13 +94,15 @@ const Navbar = () => {
               <div
                 className="mt-1"
                 style={{
-                  color: "lightslategrey",
                   fontSize: "0.8rem",
                   fontWeight: "400",
                   whiteSpace: "nowrap",
+                  background: "linear-gradient(90deg, #d4af37, #6c757d)", // gold to grey
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
                 }}
               >
-                Trust your brand with our services
+                Book your tickets
               </div>
             </div>
           </Link>
