@@ -1,0 +1,131 @@
+import React from "react";
+import axios from "axios";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const Login = () => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [InputErrorList, setInputErrorList] = useState({});
+  const [alert, setAlert] = useState({ show: false, type: "", message: "" });
+  const [loginInput, setLogin] = useState({
+    email: "",
+    password: "",
+  });
+  const handleInput = (e) => {
+    const { name, value } = e.target;
+
+    setLogin((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setInputErrorList((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+  };
+
+  const loginSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    const data = {
+      email: loginInput.email,
+      password: loginInput.password,
+    };
+
+    axios
+      .post(`http://127.0.0.1:8000/api/login`, data)
+      .then((response) => {
+        if (response.status === 200) {
+          const now = new Date().getTime(); // current time in ms
+          const expiryTime = now + 20 * 60 * 1000; // 20 minutes from now
+
+          localStorage.setItem("auth_token", response.data.token);
+          localStorage.setItem("role", response.data.role);
+          localStorage.setItem("auth_token_expiry", expiryTime); // new line
+          localStorage.setItem("name", response.data.user);
+
+          navigate("/home");
+          window.location.reload();
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+        if (error.response) {
+          setInputErrorList(error.response.data.errors);
+        }
+      });
+  };
+  return (
+    <div
+      className="d-flex flex-column min-vh-100"
+      style={{ paddingTop: "4.5rem" }} // Adjust depending on your navbar height
+    >
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-md-5">
+            <form onSubmit={loginSubmit}>
+              <div className="mb-3">
+                <label className="form-label">Email address</label>
+                <input
+                  type="email"
+                  name="email"
+                  className="form-control"
+                  onChange={handleInput}
+                  value={loginInput.email}
+                />
+                <span className="text-danger">{InputErrorList.email}</span>
+              </div>
+              <div className="mb-3">
+                <label className="form-label">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  onChange={handleInput}
+                  value={loginInput.password}
+                  className="form-control"
+                  id="exampleInputPassword1"
+                />
+                <span className="text-danger">{InputErrorList.password}</span>
+              </div>
+
+              <button
+                type="submit"
+                variant="primary"
+                disabled={loading}
+                className="btn text-white border-0"
+                style={{
+                  background: "linear-gradient(90deg, #6a0dad, #0000ff)",
+                  padding: "0.6rem 1.5rem",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
+                }}
+              >
+                {loading ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    Loading...
+                  </>
+                ) : (
+                  "submit"
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
