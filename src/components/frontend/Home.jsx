@@ -5,27 +5,35 @@ import img3 from "../images/img3.jpg";
 import img2 from "../images/img2.jpg";
 import img4 from "../images/img4.jpg";
 import AxiosInstance from "../../AxiosInstance";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Home = () => {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
-  const [wishList, setWishlist] = useState([]);
   const navigate = useNavigate();
+
   const movies = [
     {
       img: img3,
       price: "$200",
       title: "Movie One",
+      date: "10th Wednesday, August 2025",
+      time: "12:00pm",
     },
     {
       img: img2,
       price: "$250",
       title: "Movie Two",
+      date: "13th Tuesday, August 2025",
+      time: "2:00pm",
     },
     {
       img: img4,
       price: "$180",
       title: "Movie Three",
+      date: "20th Friday, August 2025",
+      time: "1:30pm",
     },
   ];
 
@@ -40,7 +48,6 @@ const Home = () => {
         setUsername(username);
         setLoading(false); // token is valid
       } else {
-        // token expired or not present
         localStorage.removeItem("auth_token");
         localStorage.removeItem("role");
         localStorage.removeItem("auth_token_expiry");
@@ -48,8 +55,32 @@ const Home = () => {
         navigate("/login");
         window.location.reload();
       }
-    }, 2000); // Optional delay for loading effect
+    }, 2000);
   }, [navigate]);
+
+  const addToWishlist = (e, movie) => {
+    e.preventDefault();
+    let wishList = JSON.parse(localStorage.getItem("wishList")) || [];
+
+    const exists = wishList.find((item) => item.title === movie.title);
+    if (exists) {
+      toast.error("Already in wishlist!");
+    } else {
+      const wishLists = [...wishList, movie];
+      localStorage.setItem("wishList", JSON.stringify(wishLists));
+      toast.success("Added to wishlist!");
+    }
+  };
+
+  const handleViewList = () => {
+    const wishList = JSON.parse(localStorage.getItem("wishList")) || [];
+    if (wishList.length > 0) {
+      toast.info(`You have ${wishList.length} item(s) in your wishlist.`);
+    } else {
+      toast.warning("Your wishlist is empty.");
+    }
+  };
+
   if (loading) {
     return (
       <div className="loader-container">
@@ -61,27 +92,11 @@ const Home = () => {
       </div>
     );
   }
-  const addToWishlist = (e, movie) => {
-    e.preventDefault();
-    let wishList = JSON.parse(localStorage.getItem("wishList")) || [];
-    const newId =
-      wishList.length > 0
-        ? Math.max(...wishList.map((item) => item.id)) + 1
-        : 1;
 
-    const exists = wishList.find((item) => item.title === movie.title);
-    if (exists) {
-      alert("no");
-    } else {
-      const wishLists = [...wishList, movie];
-      //wishList.push(wishlistItem);
-      localStorage.setItem("wishList", JSON.stringify(wishLists));
-
-      alert("ok");
-    }
-  };
   return (
     <div>
+      <ToastContainer position="top-right" autoClose={3000} theme="dark" />
+
       <div className="container">
         <div className="row">
           <div className="col-md-4" style={{ marginTop: "-75px" }}>
@@ -97,8 +112,8 @@ const Home = () => {
           <div className="col-md-12 text-center justify-content-center">
             <p
               style={{
-                fontSize: "1rem", // reduced font size
-                width: "85%", // increased width
+                fontSize: "1rem",
+                width: "85%",
                 maxWidth: "800px",
                 color: "grey",
                 fontFamily: "'Orbitron', sans-serif",
@@ -138,10 +153,10 @@ const Home = () => {
               fontFamily: "'Orbitron', sans-serif",
               fontSize: "28px",
               marginBottom: "30px",
-              background: "linear-gradient(90deg, #d4af37, #6c757d)", // gold to grey
+              background: "linear-gradient(90deg, #d4af37, #6c757d)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-              textShadow: "0 0 6px rgba(0, 0, 0, 0.1)", // optional soft shadow
+              textShadow: "0 0 6px rgba(0, 0, 0, 0.1)",
             }}
           >
             Coming soon
@@ -155,17 +170,14 @@ const Home = () => {
               paddingLeft: "clamp(16px, 6vw, 0px)",
               overflowX: "auto",
               whiteSpace: "nowrap",
-
-              // ✅ Hide scrollbar
-              scrollbarWidth: "none", // Firefox
-              msOverflowStyle: "none", // IE/Edge
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
             }}
-            className="hide-scrollbar" // 👈 we'll define this class below for WebKit
+            className="hide-scrollbar"
           >
             {movies.map((movie) => (
               <div
                 key={movie.title}
-                id={movie.id}
                 style={{
                   position: "relative",
                   width: "clamp(260px, 30vw, 600px)",
@@ -187,7 +199,6 @@ const Home = () => {
                   }}
                 />
 
-                {/* Price Tag */}
                 <div
                   style={{
                     position: "absolute",
@@ -207,7 +218,6 @@ const Home = () => {
                   {movie.price}
                 </div>
 
-                {/* Wishlist Button */}
                 <button
                   style={{
                     position: "absolute",
@@ -249,13 +259,14 @@ const Home = () => {
             <div className="col-md-4 d-flex justify-content-center">
               <button
                 className="mb-3"
+                onClick={handleViewList}
                 style={{
-                  background: "linear-gradient(90deg, #28a745, #6c757d)", // green to grey
+                  background: "linear-gradient(90deg, #28a745, #6c757d)",
                   padding: "0.6rem 1.5rem",
                   fontWeight: "bold",
                   borderRadius: "8px",
-                  width: "100%", // Optional: full width in its column
-                  maxWidth: "250px", // 👈 Optional: control max width
+                  width: "100%",
+                  maxWidth: "250px",
                 }}
               >
                 View Lists

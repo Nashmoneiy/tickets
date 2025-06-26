@@ -53,29 +53,78 @@ const Wishlist = () => {
             backgroundColor: "rgba(255, 255, 255, 0.05)",
             backdropFilter: "blur(2px)",
             borderRadius: "10px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
           }}
         >
-          <div className="d-flex justify-content-between flex-wrap">
-            <div style={{ flex: 1 }}>{item.title}</div>
-            <div style={{ flex: 1 }}>{item.price}</div>
-          </div>
-          <div style={{ maxWidth: "180px" }}>
-            <select
-              className="form-select text-white"
-              name="quantity"
+          <div className="row align-items-center gy-2">
+            <div
+              className="col-12 col-sm-6 col-md-3"
               style={{
-                backgroundColor: "#2c2f33",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                color: "#fff",
+                background: "linear-gradient(90deg, #ffffff, #FFD700)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
               }}
             >
-              <option value="">--select count--</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-            </select>
+              {item.title}
+            </div>
+            <div
+              className="col-12 col-sm-6 col-md-3"
+              style={{
+                background: "linear-gradient(90deg, #ffffff, #FFD700)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              {item.price} for a seat
+            </div>
+            <div className="col-12 col-md-5 d-flex flex-column flex-md-row justify-content-end justify-content-md-start text-end text-md-start gap-md-3">
+              <div
+                className=""
+                style={{
+                  background: "linear-gradient(90deg, #ffffff, #FFD700)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                {item.time}
+              </div>
+              <div
+                style={{
+                  background: "linear-gradient(90deg, #ffffff, #FFD700)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                {item.date}
+              </div>
+            </div>
+            <div className="w-50 w-md-100">
+              <p
+                className="mt-3"
+                style={{
+                  background:
+                    "linear-gradient(90deg, #ffffff,rgb(162, 159, 137))",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                selct no of people
+              </p>
+              <select
+                className="form-select text-white "
+                name="quantity"
+                style={{
+                  backgroundColor: "#2c2f33",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  color: "#fff",
+                }}
+              >
+                <option selected value="1">
+                  --count--
+                </option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+            </div>
           </div>
         </div>
       ))
@@ -86,10 +135,10 @@ const Wishlist = () => {
   return (
     <div className="container">
       <div className="row justify-content-center text-white">
-        <div className="col-md-10 col-lg-8">
+        <div className="col-12">
           {wishlistDetails}
           <button
-            className="btn mt-3"
+            className="btn mt-3 w-100 w-md-auto mb-2"
             style={{
               backgroundImage:
                 "linear-gradient(to right, #006400, #FFD700, #800080)",
