@@ -1,19 +1,42 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import AxiosInstance from "../../../AxiosInstance";
 
 const Navbar = () => {
-  const logoutSubmit = () => {};
+  const logoutSubmit = (e) => {
+    e.preventDefault();
+    AxiosInstance.post("/api/logout")
+      .then((response) => {
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("auth_token_expiry");
+        localStorage.removeItem("name");
+        if (response.status === 200) {
+          window.location.reload();
+        }
+      })
+      .catch((error) => console.log(error));
+  };
   const token = localStorage.getItem("auth_token");
 
   const authButtons = token ? (
-    <ul className="navbar-nav text-center gap-lg-4 gap-2">
+    <ul className="navbar-nav d-flex flex-column flex-lg-row align-items-center justify-content-center gap-2 gap-lg-4 mx-auto">
       <li className="nav-item">
         <Link className="nav-link" to="/wishlist">
           Wishlist
         </Link>
       </li>
       <li className="nav-item">
-        <button className="logout-btn nav-link" onClick={logoutSubmit}>
+        <button
+          className="nav-link btn btn-link p-0 m-0"
+          onClick={logoutSubmit}
+          style={{
+            textDecoration: "none",
+            color: "",
+            fontSize: "1rem",
+            fontWeight: "400",
+          }}
+        >
           Logout
         </button>
       </li>
@@ -39,7 +62,7 @@ const Navbar = () => {
         <div className="container-fluid">
           <Link
             to="#"
-            className="navbar-brand m-0 p-0 d-flex align-items-center gap-3"
+            className="navbar-brand m-0 p-0 d-flex align-items-center gap-1"
             style={{
               fontWeight: "bold",
               lineHeight: "1.2",
@@ -50,6 +73,7 @@ const Navbar = () => {
             }}
           >
             <div
+              className="mb-3"
               style={{
                 width: "45px",
                 height: "45px",
@@ -67,6 +91,7 @@ const Navbar = () => {
             <div className="d-flex flex-column align-items-start text-truncate">
               <div>
                 <span
+                  className=""
                   style={{
                     fontSize: "2rem",
                     background: "linear-gradient(90deg, #6a0dad, #0000ff)",
@@ -108,8 +133,8 @@ const Navbar = () => {
           </Link>
 
           <button
-            className="navbar-toggler me-2"
-            style={{ border: "none", boxShadow: "none" }}
+            className="navbar-toggler me-2 mb-1"
+            style={{ border: "none", boxShadow: "none", fontSize: "15px" }}
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#navbarNav"
@@ -121,7 +146,7 @@ const Navbar = () => {
           </button>
 
           <div
-            className="collapse navbar-collapse justify-content-lg-end justify-content-center me-2 gap-2"
+            className="collapse navbar-collapse justify-content-center text-center"
             id="navbarNav"
           >
             {authButtons}

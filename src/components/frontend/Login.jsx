@@ -44,7 +44,7 @@ const Login = () => {
       .then((response) => {
         if (response.status === 200) {
           const now = new Date().getTime(); // current time in ms
-          const expiryTime = now + 20 * 60 * 1000; // 20 minutes from now
+          const expiryTime = now + 40 * 60 * 1000; // 20 minutes from now
 
           localStorage.setItem("auth_token", response.data.token);
           localStorage.setItem("role", response.data.role);
@@ -57,8 +57,21 @@ const Login = () => {
       })
       .catch(function (error) {
         console.log(error);
-        if (error.response) {
+        if (error.response.data.status === 422) {
           setInputErrorList(error.response.data.errors);
+        }
+        if (error.response.data.status === 401) {
+          setAlert({
+            show: true,
+            type: "danger",
+            message: error.response.data.message,
+          });
+          setLogin({
+            name: "",
+            email: "",
+            password: "",
+          });
+          //window.location.reload();
         }
       });
   };
@@ -70,6 +83,19 @@ const Login = () => {
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-5">
+            {alert.show && (
+              <div
+                className={`alert alert-${alert.type} alert-dismissible fade show mt-2`}
+                role="alert"
+              >
+                {alert.message}
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setAlert({ ...alert, show: false })}
+                ></button>
+              </div>
+            )}
             <form onSubmit={loginSubmit}>
               <div className="mb-3">
                 <label className="form-label">Email address</label>

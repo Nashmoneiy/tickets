@@ -9,7 +9,26 @@ import AxiosInstance from "../../AxiosInstance";
 const Home = () => {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
+  const [wishList, setWishlist] = useState([]);
   const navigate = useNavigate();
+  const movies = [
+    {
+      img: img3,
+      price: "$200",
+      title: "Movie One",
+    },
+    {
+      img: img2,
+      price: "$250",
+      title: "Movie Two",
+    },
+    {
+      img: img4,
+      price: "$180",
+      title: "Movie Three",
+    },
+  ];
+
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
     const expiry = localStorage.getItem("auth_token_expiry");
@@ -42,6 +61,25 @@ const Home = () => {
       </div>
     );
   }
+  const addToWishlist = (e, movie) => {
+    e.preventDefault();
+    let wishList = JSON.parse(localStorage.getItem("wishList")) || [];
+    const newId =
+      wishList.length > 0
+        ? Math.max(...wishList.map((item) => item.id)) + 1
+        : 1;
+
+    const exists = wishList.find((item) => item.title === movie.title);
+    if (exists) {
+      alert("no");
+    } else {
+      const wishLists = [...wishList, movie];
+      //wishList.push(wishlistItem);
+      localStorage.setItem("wishList", JSON.stringify(wishLists));
+
+      alert("ok");
+    }
+  };
   return (
     <div>
       <div className="container">
@@ -124,9 +162,10 @@ const Home = () => {
             }}
             className="hide-scrollbar" // 👈 we'll define this class below for WebKit
           >
-            {[img3, img2, img4].map((img, index) => (
+            {movies.map((movie) => (
               <div
-                key={index}
+                key={movie.title}
+                id={movie.id}
                 style={{
                   position: "relative",
                   width: "clamp(260px, 30vw, 600px)",
@@ -138,38 +177,37 @@ const Home = () => {
                 }}
               >
                 <img
-                  src={img}
+                  src={movie.img}
+                  alt={movie.title}
                   style={{
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
                     display: "block",
                   }}
-                  alt=""
                 />
 
-                {/* ✅ Price badge (top-left) */}
-                {/* ✅ Transparent Price Tag (top-left) */}
+                {/* Price Tag */}
                 <div
                   style={{
                     position: "absolute",
                     top: "12px",
                     left: "12px",
-                    backgroundColor: "rgba(255, 255, 255, 0.25)", // same as wishlist button
+                    backgroundColor: "rgba(255, 255, 255, 0.25)",
                     border: "1px solid rgba(255, 255, 255, 0.4)",
                     color: "#fff",
                     padding: "8px 14px",
                     borderRadius: "6px",
                     fontWeight: "bold",
-                    fontSize: "1rem", // increased font size
+                    fontSize: "1rem",
                     backdropFilter: "blur(4px)",
-                    textShadow: "0 0 6px rgba(0, 0, 0, 0.4)", // optional: soft glow
+                    textShadow: "0 0 6px rgba(0, 0, 0, 0.4)",
                   }}
                 >
-                  $200
+                  {movie.price}
                 </div>
 
-                {/* ✅ Wishlist button (bottom-right) */}
+                {/* Wishlist Button */}
                 <button
                   style={{
                     position: "absolute",
@@ -195,7 +233,7 @@ const Home = () => {
                       "rgba(255, 255, 255, 0.25)";
                     e.target.style.transform = "scale(1)";
                   }}
-                  onClick={() => alert("Added to wishlist")}
+                  onClick={(e) => addToWishlist(e, movie)}
                 >
                   Add to wishlist
                 </button>
