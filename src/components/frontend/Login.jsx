@@ -76,8 +76,6 @@ const Login = () => {
             message: error.response.data.message,
           });
           setLogin({
-            name: "",
-            email: "",
             password: "",
           });
           //window.location.reload();
