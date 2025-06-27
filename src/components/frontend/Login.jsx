@@ -76,6 +76,7 @@ const Login = () => {
             message: error.response.data.message,
           });
           setLogin({
+            ...prev,
             password: "",
           });
           //window.location.reload();
