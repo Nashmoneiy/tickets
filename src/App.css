@@ -85,6 +85,10 @@ input:focus {
         border: none;
         
     }
+    h6 .menu{
+      text-decoration: none;
+      color: red;
+    }
 
 
 

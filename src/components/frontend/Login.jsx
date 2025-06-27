@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -40,7 +41,10 @@ const Login = () => {
     };
 
     axios
-      .post(`https://ticket-api-production-3c8e.up.railway.app/api/login`, data)
+      .post(
+        `https://ticket-api-production-3c8e.up.railway.appr/api/login`,
+        data
+      )
       .then((response) => {
         if (response.status === 200) {
           const now = new Date().getTime(); // current time in ms
@@ -147,6 +151,17 @@ const Login = () => {
                 )}
               </button>
             </form>
+            <h6
+              className="mt-2 menu"
+              style={{
+                color: "lightslategray",
+              }}
+            >
+              dont have an account?{" "}
+              <Link to="/register" className="text-decoration-none">
+                create one
+              </Link>
+            </h6>
           </div>
         </div>
       </div>

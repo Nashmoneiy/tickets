@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   const [loading, setLoading] = useState(false);
@@ -158,6 +159,17 @@ const Register = () => {
                 )}
               </button>
             </form>
+            <h6
+              className="mt-2"
+              style={{
+                color: "lightslategray",
+              }}
+            >
+              already have an account?{" "}
+              <Link to="/login" className="text-decoration-none">
+                login
+              </Link>
+            </h6>
           </div>
         </div>
       </div>
