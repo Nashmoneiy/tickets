@@ -73,12 +73,19 @@ const Home = () => {
   };
 
   const handleViewList = () => {
-    const wishList = JSON.parse(localStorage.getItem("wishList")) || [];
-    if (wishList.length > 0) {
+    navigate("/wishlist");
+    // const wishList = JSON.parse(localStorage.getItem("wishList")) || [];
+    // nav;
+    // {
+    //  {
+    /*if (wishList.length > 0) {
       toast.info(`You have ${wishList.length} item(s) in your wishlist.`);
     } else {
       toast.warning("Your wishlist is empty.");
-    }
+    }--
+    ^*/
+    // }
+    //  }
   };
 
   if (loading) {
