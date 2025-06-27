@@ -2,6 +2,13 @@ body {
   padding-top: 80px; /* Adjust based on your navbar's height */
   
 }
+input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
 @media (max-width: 991.98px) {
   #navbarNav.collapse.show {
     
@@ -85,10 +92,16 @@ input:focus {
         border: none;
         
     }
-    h6 .menu{
-      text-decoration: none;
-      color: red;
-    }
+
+
+    input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+  
 
 
 
