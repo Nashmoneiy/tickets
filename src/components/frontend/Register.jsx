@@ -3,8 +3,14 @@ import { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 const Register = () => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePassword = () => {
+    setShowPassword((prev) => !prev);
+  };
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [InputErrorList, setInputErrorList] = useState({});
@@ -123,15 +129,29 @@ const Register = () => {
                 <span className="text-danger">{InputErrorList.email}</span>
               </div>
 
-              <div className="mb-3">
+              <div className="mb-3 position-relative">
                 <label className="form-label">Password</label>
                 <input
-                  type="password"
-                  className="form-control"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   onChange={handleInput}
                   value={registerInput.password}
+                  className="form-control pe-5"
+                  id="exampleInputPassword1"
                 />
+                <button
+                  type="button"
+                  onClick={togglePassword}
+                  className="btn position-absolute top-50 end-0 translate-middle-y me-2 p-0 border-0 bg-transparent mt-3"
+                  style={{ outline: "none", boxShadow: "none" }}
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff size={20} color="gray" />
+                  ) : (
+                    <Eye size={20} color="gray" />
+                  )}
+                </button>
                 <span className="text-danger">{InputErrorList.password}</span>
               </div>
 

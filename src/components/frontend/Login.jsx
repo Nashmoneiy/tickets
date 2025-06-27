@@ -3,8 +3,15 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [InputErrorList, setInputErrorList] = useState({});
@@ -13,6 +20,7 @@ const Login = () => {
     email: "",
     password: "",
   });
+
   const handleInput = (e) => {
     const { name, value } = e.target;
 
@@ -109,16 +117,30 @@ const Login = () => {
                 />
                 <span className="text-danger">{InputErrorList.email}</span>
               </div>
-              <div className="mb-3">
+
+              <div className="mb-3 position-relative">
                 <label className="form-label">Password</label>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   onChange={handleInput}
                   value={loginInput.password}
-                  className="form-control"
+                  className="form-control pe-5"
                   id="exampleInputPassword1"
                 />
+                <button
+                  type="button"
+                  onClick={togglePassword}
+                  className="btn position-absolute top-50 mt-3 end-0 translate-middle-y me-2 p-0 border-0 bg-transparent"
+                  style={{ outline: "none", boxShadow: "none" }}
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff size={20} color="gray" />
+                  ) : (
+                    <Eye size={20} color="gray" />
+                  )}
+                </button>
                 <span className="text-danger">{InputErrorList.password}</span>
               </div>
 
