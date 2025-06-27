@@ -253,8 +253,8 @@ const Home = () => {
         </div>
       </section>
 
-      <section>
-        <div className="container mt-4">
+      <section className="mb-4">
+        <div className="container mt-1">
           <div className="row justify-content-center">
             <div className="col-md-4 d-flex justify-content-center">
               <button

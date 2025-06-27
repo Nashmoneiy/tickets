@@ -1,8 +1,37 @@
 import React from "react";
+import { useEffect, useRef } from "react";
+
 import { Link } from "react-router-dom";
 import AxiosInstance from "../../../AxiosInstance";
 
 const Navbar = () => {
+  const navRef = useRef(null);
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      const navbar = document.getElementById("navbarNav");
+      const toggler = document.querySelector(".navbar-toggler");
+
+      // Only collapse if it's open and the click is outside OR on a <li> inside the collapse
+      const clickedOutside =
+        navRef.current && !navRef.current.contains(e.target);
+      const clickedNavItem =
+        navbar.contains(e.target) && e.target.closest("li.nav-item");
+
+      if (
+        navbar.classList.contains("show") &&
+        (clickedOutside || clickedNavItem)
+      ) {
+        toggler.click(); // trigger collapse
+      }
+    };
+
+    document.addEventListener("click", handleClick);
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, []);
+
   const logoutSubmit = (e) => {
     e.preventDefault();
     AxiosInstance.post("/api/logout")
@@ -58,7 +87,10 @@ const Navbar = () => {
 
   return (
     <div style={{ overflowX: "hidden" }}>
-      <nav className="navbar navbar-expand-lg bg-dark navbar-dark fixed-top py-4 w-100">
+      <nav
+        className="navbar navbar-expand-lg bg-dark navbar-dark fixed-top py-4 w-100"
+        ref={navRef}
+      >
         <div className="container-fluid">
           <Link
             to="#"

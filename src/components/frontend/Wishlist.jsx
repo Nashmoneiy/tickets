@@ -1,10 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import CheckoutDrawer from "./CheckoutDrawer"; // adjust path
 
 const Wishlist = () => {
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [wishlist, setWishlist] = useState([]);
   const navigate = useNavigate();
+
+  const deleteWishlist = (e, title) => {
+    let wishlistItem = JSON.parse(localStorage.getItem("wishList")) || [];
+    const updateWishlist = wishlistItem.filter((item) => item.title !== title);
+    localStorage.setItem("wishList", JSON.stringify(updateWishlist));
+    setWishlist(updateWishlist);
+
+    alert(title);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -88,6 +100,7 @@ const Wishlist = () => {
                 {item.time}
               </div>
               <div
+                className="ms-auto"
                 style={{
                   background: "linear-gradient(90deg, #ffffff, #FFD700)",
                   WebkitBackgroundClip: "text",
@@ -125,6 +138,31 @@ const Wishlist = () => {
                 <option value="2">2</option>
               </select>
             </div>
+            <div className="d-flex justify-content-end">
+              <button
+                className="remove-cart"
+                onClick={(e) => deleteWishlist(e, item.title)}
+              >
+                remove
+              </button>
+
+              <style>{`
+  .remove-cart {
+    font-weight: 600; /* Default weight */
+    border: none;
+    background: none;
+    color: #dc3545; /* Bootstrap danger color */
+    cursor: pointer;
+  }
+
+  @media (max-width: 576px) {
+    .remove-cart {
+      font-weight: 400 !important; /* Lighter on small screens */
+      font-size: 0.85rem;
+    }
+  }
+`}</style>
+            </div>
           </div>
         </div>
       ))
@@ -133,33 +171,100 @@ const Wishlist = () => {
     );
 
   return (
-    <div className="container">
-      <div className="row justify-content-center text-white">
-        <div className="col-12">
-          {wishlistDetails}
-          <button
-            className="btn mt-3 w-100 w-md-auto mb-2"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, #006400, #FFD700, #800080)",
-              color: "#fff",
-              border: "none",
-              fontWeight: "600",
-              padding: "10px 24px",
-              borderRadius: "10px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-              transition: "transform 0.2s ease-in-out",
-            }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.transform = "scale(1.05)")
-            }
-            onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
-          >
-            Checkout
-          </button>
+    <>
+      <div className="container mb-4">
+        <div className="row justify-content-center text-white">
+          <div className="col-12 mb-2">
+            {wishlistDetails}
+            {wishlist.length >= 1 && (
+              <button
+                onClick={() => setIsCheckoutOpen(true)}
+                className="btn mt-3 w-100 w-md-auto"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(to right, #006400, #FFD700, #800080)",
+                  color: "#fff",
+                  border: "none",
+                  fontWeight: "600",
+                  padding: "10px 24px",
+                  borderRadius: "10px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                  transition: "transform 0.2s ease-in-out",
+                }}
+              >
+                Checkout
+              </button>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      <CheckoutDrawer
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+      >
+        <div>
+          <h5>checkout</h5>
+          <form className="w-100 px-2">
+            <div className="mb-3">
+              <label className="form-label">Name</label>
+              <input
+                type="text"
+                className="form-control bg-dark text-white border-secondary"
+                placeholder="Your name"
+                style={{ padding: "12px", fontSize: "1rem" }}
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Phone</label>
+              <input
+                type="text"
+                className="form-control bg-dark text-white border-secondary"
+                placeholder="Your phone number"
+                style={{ padding: "12px", fontSize: "1rem" }}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Email</label>
+              <input
+                type="text"
+                className="form-control bg-dark text-white border-secondary"
+                placeholder="Your phone number"
+                style={{ padding: "12px", fontSize: "1rem" }}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Address</label>
+              <input
+                type="text"
+                className="form-control bg-dark text-white border-secondary"
+                placeholder="Your phone number"
+                style={{ padding: "12px", fontSize: "1rem" }}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">State</label>
+              <input
+                type="text"
+                className="form-control bg-dark text-white border-secondary"
+                placeholder="Your phone number"
+                style={{ padding: "12px", fontSize: "1rem" }}
+              />
+            </div>
+            <button
+              type="submit"
+              className="btn btn-success w-100 text-white fw-semibold py-2"
+              style={{ fontSize: "1rem" }}
+            >
+              Confirm Payment
+            </button>
+          </form>
+        </div>
+      </CheckoutDrawer>
+    </>
   );
 };
 
