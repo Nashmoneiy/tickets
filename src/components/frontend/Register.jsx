@@ -2,8 +2,10 @@ import React from "react";
 import { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [InputErrorList, setInputErrorList] = useState({});
   const [alert, setAlert] = useState({ show: false, type: "", message: "" });
@@ -55,6 +57,7 @@ const Register = () => {
           email: "",
           password: "",
         });
+        navigate("/home");
       })
       .catch(function (error) {
         console.log(error);
