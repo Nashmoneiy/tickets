@@ -57,7 +57,6 @@ const Register = () => {
           email: "",
           password: "",
         });
-        navigate("/home");
       })
       .catch(function (error) {
         console.log(error);
