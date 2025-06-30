@@ -51,6 +51,11 @@ const Navbar = () => {
   const authButtons = token ? (
     <ul className="navbar-nav d-flex flex-column flex-lg-row align-items-center justify-content-center gap-2 gap-lg-4 mx-auto">
       <li className="nav-item">
+        <Link className="nav-link" to="/home">
+          Home
+        </Link>
+      </li>
+      <li className="nav-item">
         <Link className="nav-link" to="/wishlist">
           Wishlist
         </Link>

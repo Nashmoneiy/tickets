@@ -9,9 +9,34 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Home = () => {
+  const [selectedGenres, setSelectedGenres] = useState([]);
+
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const handleGenreChange = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setSelectedGenres([...selectedGenres, value]);
+    } else {
+      setSelectedGenres(selectedGenres.filter((genre) => genre !== value));
+    }
+  };
+
+  const handleFilter = (e) => {
+    e.preventDefault();
+
+    if (selectedGenres.length === 0) {
+      // If no filters selected, show all movies
+      setFilteredMovies(movies);
+    } else {
+      const filtered = movies.filter((movie) =>
+        movie.genres.some((genre) => selectedGenres.includes(genre))
+      );
+
+      setFilteredMovies(filtered);
+    }
+  };
 
   const movies = [
     {
@@ -20,6 +45,7 @@ const Home = () => {
       title: "Movie One",
       date: "10th Wednesday, August 2025",
       time: "12:00pm",
+      genres: ["Drama"],
     },
     {
       img: img2,
@@ -27,6 +53,7 @@ const Home = () => {
       title: "Movie Two",
       date: "13th Tuesday, August 2025",
       time: "2:00pm",
+      genres: ["Horror", "Action"],
     },
     {
       img: img4,
@@ -34,8 +61,10 @@ const Home = () => {
       title: "Movie Three",
       date: "20th Friday, August 2025",
       time: "1:30pm",
+      genres: ["Drama", "Action"],
     },
   ];
+  const [filteredMovies, setFilteredMovies] = useState(movies);
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -116,6 +145,55 @@ const Home = () => {
 
       <section className="section justify-content-center">
         <div className="row">
+          <div className="col-9 col-sm-6 col-md-4 m-3">
+            <div
+              className="card"
+              style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+            >
+              <div className="card-body">
+                <form action="">
+                  <label class="d-block">
+                    <input
+                      type="checkbox"
+                      name="genre[]"
+                      className="mb-2"
+                      value="Action"
+                      onChange={handleGenreChange}
+                      checked={selectedGenres.includes("Action")}
+                    />
+                    Action
+                  </label>
+                  <label class="d-block" className="mb-1">
+                    <input
+                      type="checkbox"
+                      name="genre[]"
+                      value="Drama"
+                      onChange={handleGenreChange}
+                      checked={selectedGenres.includes("Drama")}
+                    />
+                    Drama
+                  </label>
+                  <label class="d-block">
+                    <input
+                      type="checkbox"
+                      name="genre[]"
+                      value="Horror"
+                      onChange={handleGenreChange}
+                      checked={selectedGenres.includes("Horror")}
+                    />
+                    Horror
+                  </label>
+                  <button
+                    className="btn btn-info btn-sm float-end"
+                    onClick={handleFilter}
+                    type="button"
+                  >
+                    <i className="fa fa-filter"></i> Filter
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
           <div className="col-md-12 text-center justify-content-center">
             <p
               style={{
@@ -182,7 +260,7 @@ const Home = () => {
             }}
             className="hide-scrollbar"
           >
-            {movies.map((movie) => (
+            {filteredMovies.map((movie) => (
               <div
                 key={movie.title}
                 style={{

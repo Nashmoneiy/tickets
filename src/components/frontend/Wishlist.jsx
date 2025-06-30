@@ -2,12 +2,44 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import CheckoutDrawer from "./CheckoutDrawer"; // adjust path
+import AxiosInstance from "../../AxiosInstance";
 
 const Wishlist = () => {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [InputErrorList, setInputErrorList] = useState({});
   const [loading, setLoading] = useState(true);
   const [wishlist, setWishlist] = useState([]);
   const navigate = useNavigate();
+  const [quantities, setQuantities] = useState({});
+  // default value as "1"
+
+  const handleQuantityChange = (e, title) => {
+    const value = e.target.value;
+    setQuantities((prev) => ({
+      ...prev,
+      [title]: value,
+    }));
+  };
+
+  const [checkoutInput, setCheckout] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    state: "",
+  });
+  const handleInput = (e) => {
+    const { name, value } = e.target;
+    setCheckout((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setInputErrorList((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+  };
 
   const deleteWishlist = (e, title) => {
     let wishlistItem = JSON.parse(localStorage.getItem("wishList")) || [];
@@ -42,6 +74,29 @@ const Wishlist = () => {
       }
     }, 2000);
   }, [navigate]);
+
+  const checkoutSubmit = (e) => {
+    e.preventDefault();
+    const data = {
+      name: checkoutInput.name,
+      email: checkoutInput.email,
+      phone: checkoutInput.phone,
+      address: checkoutInput.address,
+      state: checkoutInput.state,
+    };
+    AxiosInstance.post(`http://127.0.0.1:8000/api/checkout`, data)
+      .then((response) => {
+        if (response.status === 200) {
+          alert("ok");
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+        if (error.response.data.status === 422) {
+          setInputErrorList(error.response.data.errors);
+        }
+      });
+  };
 
   if (loading) {
     return (
@@ -123,15 +178,17 @@ const Wishlist = () => {
                 selct no of people
               </p>
               <select
-                className="form-select text-white "
+                className="form-select text-white"
                 name="quantity"
+                value={quantities[item.title] || "1"} // default to "1"
+                onChange={(e) => handleQuantityChange(e, item.title)}
                 style={{
                   backgroundColor: "#2c2f33",
                   border: "1px solid rgba(255, 255, 255, 0.2)",
                   color: "#fff",
                 }}
               >
-                <option selected value="1">
+                <option value="" disabled>
                   --count--
                 </option>
                 <option value="1">1</option>
@@ -174,6 +231,9 @@ const Wishlist = () => {
     <>
       <div className="container mb-4">
         <div className="row justify-content-center text-white">
+          <div className="col-md-12">
+            <span>total:</span>
+          </div>
           <div className="col-12 mb-2">
             {wishlistDetails}
             {wishlist.length >= 1 && (
@@ -205,54 +265,74 @@ const Wishlist = () => {
       >
         <div>
           <h5>checkout</h5>
-          <form className="w-100 px-2">
+          <form className="w-100 px-2" onSubmit={checkoutSubmit}>
             <div className="mb-3">
               <label className="form-label">Name</label>
               <input
                 type="text"
+                name="name"
+                onChange={handleInput}
+                value={checkoutInput.name}
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="Your name"
                 style={{ padding: "12px", fontSize: "1rem" }}
               />
+              <span className="text-danger">{InputErrorList.name}</span>
             </div>
             <div className="mb-3">
               <label className="form-label">Phone</label>
               <input
                 type="text"
+                name="phone"
+                onChange={handleInput}
+                value={checkoutInput.phone}
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="Your phone number"
                 style={{ padding: "12px", fontSize: "1rem" }}
               />
+              <span className="text-danger">{InputErrorList.phone}</span>
             </div>
 
             <div className="mb-3">
               <label className="form-label">Email</label>
               <input
                 type="text"
+                name="email"
+                onChange={handleInput}
+                value={checkoutInput.email}
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="Your phone number"
                 style={{ padding: "12px", fontSize: "1rem" }}
               />
+              <span className="text-danger">{InputErrorList.email}</span>
             </div>
 
             <div className="mb-3">
               <label className="form-label">Address</label>
               <input
                 type="text"
+                name="address"
+                onChange={handleInput}
+                value={checkoutInput.address}
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="Your phone number"
                 style={{ padding: "12px", fontSize: "1rem" }}
               />
+              <span className="text-danger">{InputErrorList.address}</span>
             </div>
 
             <div className="mb-3">
               <label className="form-label">State</label>
               <input
                 type="text"
+                name="state"
+                onChange={handleInput}
+                value={checkoutInput.state}
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="Your phone number"
                 style={{ padding: "12px", fontSize: "1rem" }}
               />
+              <span className="text-danger">{InputErrorList.state}</span>
             </div>
             <button
               type="submit"

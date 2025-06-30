@@ -49,7 +49,7 @@ const Login = () => {
     };
 
     axios
-      .post(`https://ticket-api-production-3c8e.up.railway.app/api/login`, data)
+      .post(`https://ticket-api-production-3c8e.up.railway.app/login`, data)
       .then((response) => {
         if (response.status === 200) {
           const now = new Date().getTime(); // current time in ms
@@ -75,10 +75,11 @@ const Login = () => {
             type: "danger",
             message: error.response.data.message,
           });
-          setLogin({
+          setLogin((prev) => ({
             ...prev,
             password: "",
-          });
+          }));
+
           //window.location.reload();
         }
       });
