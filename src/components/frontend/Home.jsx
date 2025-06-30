@@ -7,11 +7,14 @@ import img4 from "../images/img4.jpg";
 import AxiosInstance from "../../AxiosInstance";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const Home = () => {
   const [selectedGenres, setSelectedGenres] = useState([]);
-
+  const location = useLocation();
   const [username, setUsername] = useState("");
+  const [params] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const handleGenreChange = (e) => {
@@ -41,7 +44,7 @@ const Home = () => {
   const movies = [
     {
       img: img3,
-      price: "$200",
+      price: "200",
       title: "Movie One",
       date: "10th Wednesday, August 2025",
       time: "12:00pm",
@@ -49,7 +52,7 @@ const Home = () => {
     },
     {
       img: img2,
-      price: "$250",
+      price: "250",
       title: "Movie Two",
       date: "13th Tuesday, August 2025",
       time: "2:00pm",
@@ -57,7 +60,7 @@ const Home = () => {
     },
     {
       img: img4,
-      price: "$180",
+      price: "180",
       title: "Movie Three",
       date: "20th Friday, August 2025",
       time: "1:30pm",
@@ -67,6 +70,27 @@ const Home = () => {
   const [filteredMovies, setFilteredMovies] = useState(movies);
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const reference = params.get("reference");
+
+    if (reference) {
+      AxiosInstance.get(`/api/verify-transaction/${reference}`).then(
+        (response) => {
+          console.log(response);
+          if (response.data.status === "success") {
+            console.log(response);
+            localStorage.removeItem("wishList");
+            window.history.replaceState({}, document.title, "/home");
+            toast.success(
+              "payment was succcesful, you will receive an email soon"
+            );
+          } else {
+            console.log(response.error);
+            toast.error("something went wrong");
+          }
+        }
+      );
+    }
     const token = localStorage.getItem("auth_token");
     const expiry = localStorage.getItem("auth_token_expiry");
     const now = new Date().getTime();
@@ -152,7 +176,7 @@ const Home = () => {
             >
               <div className="card-body">
                 <form action="">
-                  <label class="d-block">
+                  <label className="d-block">
                     <input
                       type="checkbox"
                       name="genre[]"
@@ -163,7 +187,7 @@ const Home = () => {
                     />
                     Action
                   </label>
-                  <label class="d-block" className="mb-1">
+                  <label className="d-block mb-1">
                     <input
                       type="checkbox"
                       name="genre[]"
@@ -173,7 +197,7 @@ const Home = () => {
                     />
                     Drama
                   </label>
-                  <label class="d-block">
+                  <label className="d-block">
                     <input
                       type="checkbox"
                       name="genre[]"
@@ -300,7 +324,7 @@ const Home = () => {
                     textShadow: "0 0 6px rgba(0, 0, 0, 0.4)",
                   }}
                 >
-                  {movie.price}
+                  ${movie.price}
                 </div>
 
                 <button

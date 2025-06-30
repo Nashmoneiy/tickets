@@ -16,6 +16,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [InputErrorList, setInputErrorList] = useState({});
   const [alert, setAlert] = useState({ show: false, type: "", message: "" });
+  var totalPrice = 0;
   const [loginInput, setLogin] = useState({
     email: "",
     password: "",
@@ -49,7 +50,7 @@ const Login = () => {
     };
 
     axios
-      .post(`https://ticket-api-production-3c8e.up.railway.app/api/login`, data)
+      .post(`http://127.0.0.1:8000/api/login`, data)
       .then((response) => {
         if (response.status === 200) {
           const now = new Date().getTime(); // current time in ms

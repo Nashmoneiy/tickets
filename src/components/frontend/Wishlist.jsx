@@ -20,6 +20,13 @@ const Wishlist = () => {
       [title]: value,
     }));
   };
+  const getTotalPrice = () => {
+    return wishlist.reduce((total, item) => {
+      const quantity = parseInt(quantities[item.title] || "1", 10);
+      const price = parseInt(item.price || 0, 10);
+      return total + quantity * price;
+    }, 0);
+  };
 
   const [checkoutInput, setCheckout] = useState({
     name: "",
@@ -83,11 +90,18 @@ const Wishlist = () => {
       phone: checkoutInput.phone,
       address: checkoutInput.address,
       state: checkoutInput.state,
+      total: getTotalPrice(),
+      items: wishlist.map((item, id) => ({
+        reserve_id: item.id,
+        title: item.title,
+        quantity: item.quantity,
+        price: item.price,
+      })),
     };
     AxiosInstance.post(`http://127.0.0.1:8000/api/checkout`, data)
       .then((response) => {
         if (response.status === 200) {
-          alert("ok");
+          window.location.href = `https://checkout.paystack.com/${response.data.access_code}`;
         }
       })
       .catch(function (error) {
@@ -141,7 +155,7 @@ const Wishlist = () => {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              {item.price} for a seat
+              ${item.price} for a seat
             </div>
             <div className="col-12 col-md-5 d-flex flex-column flex-md-row justify-content-end justify-content-md-start text-end text-md-start gap-md-3">
               <div
@@ -231,11 +245,11 @@ const Wishlist = () => {
     <>
       <div className="container mb-4">
         <div className="row justify-content-center text-white">
-          <div className="col-md-12">
-            <span>total:</span>
-          </div>
           <div className="col-12 mb-2">
             {wishlistDetails}
+            <div className="col-md-12 text-end fw-bold fs-5">
+              Total: ₦{getTotalPrice().toLocaleString()}
+            </div>
             {wishlist.length >= 1 && (
               <button
                 onClick={() => setIsCheckoutOpen(true)}
