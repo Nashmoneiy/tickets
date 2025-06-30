@@ -84,7 +84,7 @@ const Wishlist = () => {
       address: checkoutInput.address,
       state: checkoutInput.state,
     };
-    AxiosInstance.post(`http://127.0.0.1:8000/api/checkout`, data)
+    AxiosInstance.post(`https://ticket-api-production-3c8e.up.railway.app/api/checkout`, data)
       .then((response) => {
         if (response.status === 200) {
           alert("ok");
