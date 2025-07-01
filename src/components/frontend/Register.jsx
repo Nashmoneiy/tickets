@@ -47,10 +47,7 @@ const Register = () => {
     };
 
     axios
-      .post(
-        `https://ticket-api-production-3c8e.up.railway.app/api/register`,
-        data
-      )
+      .post(`http://127.0.0.1:8000/api/register`, data)
       .then((response) => {
         setAlert({
           show: true,

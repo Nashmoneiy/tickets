@@ -1,6 +1,5 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import img3 from "../images/img3.jpg";
 import img2 from "../images/img2.jpg";
 import img4 from "../images/img4.jpg";
@@ -11,58 +10,22 @@ import img8 from "../images/img8.jpg";
 import AxiosInstance from "../../AxiosInstance";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSearchParams } from "react-router-dom";
-import { useLocation } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [showMore, setShowMore] = useState(false);
-
-  const location = useLocation();
   const [username, setUsername] = useState("");
-  const [params] = useSearchParams();
   const [loading, setLoading] = useState(true);
-
-  const navigate = useNavigate();
-  const handleGenreChange = (e) => {
-    const { value, checked } = e.target;
-    if (checked) {
-      setSelectedGenres([...selectedGenres, value]);
-    } else {
-      setSelectedGenres(selectedGenres.filter((genre) => genre !== value));
-    }
-  };
-
-  const handleFilter = (e) => {
-    e.preventDefault();
-
-    if (selectedGenres.length === 0) {
-      setFilteredMovies(movies);
-      setFilteredMoreMovies(moreMovies);
-    } else {
-      const filtered = movies.filter((movie) =>
-        movie.genres.some((genre) => selectedGenres.includes(genre))
-      );
-
-      const filteredTitles = new Set(filtered.map((m) => m.title));
-
-      const filteredMore = moreMovies.filter(
-        (movie) =>
-          movie.genres.some((genre) => selectedGenres.includes(genre)) &&
-          !filteredTitles.has(movie.title)
-      );
-
-      setFilteredMovies(filtered);
-      setFilteredMoreMovies(filteredMore);
-    }
-  };
 
   const movies = [
     {
       img: img3,
       price: "200",
       title: "Movie One",
-      date: "10th Wednesday, August 2025",
+      date: "10th Aug 2025",
       time: "12:00pm",
       genres: ["Drama"],
     },
@@ -70,7 +33,7 @@ const Home = () => {
       img: img2,
       price: "250",
       title: "Movie Two",
-      date: "13th Tuesday, August 2025",
+      date: "13th Aug 2025",
       time: "2:00pm",
       genres: ["Horror", "Action"],
     },
@@ -78,7 +41,7 @@ const Home = () => {
       img: img4,
       price: "180",
       title: "Movie Four",
-      date: "20th Friday, August 2025",
+      date: "20th Aug 2025",
       time: "1:30pm",
       genres: ["Drama", "Action"],
     },
@@ -86,7 +49,7 @@ const Home = () => {
       img: img5,
       price: "180",
       title: "Movie Five",
-      date: "20th Friday, August 2025",
+      date: "20th Aug 2025",
       time: "1:30pm",
       genres: ["Drama", "Action"],
     },
@@ -96,102 +59,97 @@ const Home = () => {
       img: img6,
       price: "300",
       title: "Movie Six",
-      date: "25th Monday, August 2025",
+      date: "25th Aug 2025",
       time: "3:00pm",
       genres: ["Action"],
     },
-
     {
       img: img8,
       price: "230",
       title: "Movie Eight",
-      date: "28th Thursday, August 2025",
+      date: "28th Aug 2025",
       time: "5:00pm",
       genres: ["Action"],
     },
-    {
-      img: img7,
-      price: "250",
-      title: "Movie Seven",
-      date: "28th Thursday, August 2025",
-      time: "5:00pm",
-      genres: ["Drama", "Horror"],
-    },
   ];
+
   const [filteredMovies, setFilteredMovies] = useState(movies);
   const [filteredMoreMovies, setFilteredMoreMovies] = useState(moreMovies);
 
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const reference = params.get("reference");
+  const handleGenreChange = (e) => {
+    const { value, checked } = e.target;
+    setSelectedGenres((prev) =>
+      checked ? [...prev, value] : prev.filter((genre) => genre !== value)
+    );
+  };
 
-    if (reference) {
-      AxiosInstance.get(`/api/verify-transaction/${reference}`).then(
-        (response) => {
-          console.log(response);
-          if (response.data.status === "success") {
-            console.log(response);
-            localStorage.removeItem("wishList");
-            window.history.replaceState({}, document.title, "/home");
-            toast.success(
-              "payment was succcesful, you will receive an email soon"
-            );
-          } else {
-            console.log(response.error);
-            toast.error("something went wrong");
-          }
-        }
+  const handleFilter = () => {
+    setShowMore(false);
+    if (selectedGenres.length === 0) {
+      setFilteredMovies(movies);
+      setFilteredMoreMovies(moreMovies);
+    } else {
+      const filtered = movies.filter((movie) =>
+        movie.genres.some((genre) => selectedGenres.includes(genre))
       );
+      const filteredTitles = new Set(filtered.map((m) => m.title));
+      const filteredMore = moreMovies.filter(
+        (movie) =>
+          movie.genres.some((genre) => selectedGenres.includes(genre)) &&
+          !filteredTitles.has(movie.title)
+      );
+      setFilteredMovies(filtered);
+      setFilteredMoreMovies(filteredMore);
     }
-    const token = localStorage.getItem("auth_token");
-    const expiry = localStorage.getItem("auth_token_expiry");
-    const now = new Date().getTime();
-
-    setTimeout(() => {
-      if (token && expiry && now < parseInt(expiry)) {
-        const username = localStorage.getItem("name");
-        setUsername(username);
-        setLoading(false); // token is valid
-      } else {
-        localStorage.removeItem("auth_token");
-        localStorage.removeItem("role");
-        localStorage.removeItem("auth_token_expiry");
-        localStorage.removeItem("name");
-        navigate("/login");
-        window.location.reload();
-      }
-    }, 2000);
-  }, [navigate]);
+  };
 
   const addToWishlist = (e, movie) => {
     e.preventDefault();
     let wishList = JSON.parse(localStorage.getItem("wishList")) || [];
-
-    const exists = wishList.find((item) => item.title === movie.title);
-    if (exists) {
+    if (wishList.find((item) => item.title === movie.title)) {
       toast.error("Already in wishlist!");
     } else {
-      const wishLists = [...wishList, movie];
-      localStorage.setItem("wishList", JSON.stringify(wishLists));
+      wishList.push(movie);
+      localStorage.setItem("wishList", JSON.stringify(wishList));
       toast.success("Added to wishlist!");
     }
   };
 
-  const handleViewList = () => {
-    navigate("/wishlist");
-    // const wishList = JSON.parse(localStorage.getItem("wishList")) || [];
-    // nav;
-    // {
-    //  {
-    /*if (wishList.length > 0) {
-      toast.info(`You have ${wishList.length} item(s) in your wishlist.`);
-    } else {
-      toast.warning("Your wishlist is empty.");
-    }--
-    ^*/
-    // }
-    //  }
-  };
+  const handleViewList = () => navigate("/wishlist");
+
+  useEffect(() => {
+    const reference = new URLSearchParams(location.search).get("reference");
+    if (reference) {
+      AxiosInstance.get(`/api/verify-transaction/${reference}`)
+        .then((response) => {
+          if (response.data.status === "success") {
+            localStorage.removeItem("wishList");
+            window.history.replaceState({}, document.title, "/home");
+            toast.success(
+              "Payment was successful, you will receive an email soon."
+            );
+          } else {
+            toast.error("Something went wrong with the payment.");
+          }
+        })
+        .catch(() => toast.error("Error verifying payment."));
+    }
+
+    const token = localStorage.getItem("auth_token");
+    const expiry = localStorage.getItem("auth_token_expiry");
+    const now = Date.now();
+
+    setTimeout(() => {
+      if (token && expiry && now < parseInt(expiry)) {
+        setUsername(localStorage.getItem("name") || "");
+        setLoading(false);
+      } else {
+        localStorage.clear();
+        navigate("/login");
+        window.location.reload();
+      }
+    }, 1000);
+  }, [location.search, navigate]);
 
   if (loading) {
     return (
@@ -204,374 +162,148 @@ const Home = () => {
       </div>
     );
   }
-  const renderMoviesRow = (moviesArray) => {
-    // Exclude movies already in the first row
-    const displayedTitles = filteredMovies.map((movie) => movie.title);
-    const uniqueMovies = moviesArray.filter(
-      (movie) => !displayedTitles.includes(movie.title)
-    );
 
-    return (
-      <div
-        style={{
-          display: "flex",
-          gap: "24px",
-          flexWrap: "nowrap",
-          paddingLeft: "clamp(16px, 6vw, 0px)",
-          overflowX: "auto",
-          whiteSpace: "nowrap",
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
-        className="hide-scrollbar"
-      >
-        {uniqueMovies.map((movie) => (
+  const renderMoviesRow = (moviesArray) => (
+    <div
+      style={{
+        display: "flex",
+        gap: "16px",
+        flexWrap: "nowrap",
+        overflowX: "auto",
+        padding: "1rem",
+      }}
+      className="hide-scrollbar"
+    >
+      {moviesArray.map((movie) => (
+        <div
+          key={movie.title}
+          style={{
+            position: "relative",
+            width: "clamp(240px, 30vw, 500px)",
+            height: "280px",
+            borderRadius: "12px",
+            overflow: "hidden",
+            flex: "0 0 auto",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+          }}
+        >
+          <img
+            src={movie.img}
+            alt={movie.title}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
           <div
-            key={movie.title}
             style={{
-              position: "relative",
-              width: "clamp(260px, 30vw, 600px)",
-              height: "300px",
-              borderRadius: "16px",
-              overflow: "hidden",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              flex: "0 0 auto",
+              position: "absolute",
+              top: "10px",
+              left: "10px",
+              backgroundColor: "rgba(0,0,0,0.5)",
+              color: "#fff",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              fontWeight: "bold",
+              fontSize: "0.9rem",
             }}
           >
-            <img
-              src={movie.img}
-              alt={movie.title}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: "12px",
-                left: "12px",
-                backgroundColor: "rgba(255, 255, 255, 0.25)",
-                border: "1px solid rgba(255, 255, 255, 0.4)",
-                color: "#fff",
-                padding: "8px 14px",
-                borderRadius: "6px",
-                fontWeight: "bold",
-                fontSize: "1rem",
-                backdropFilter: "blur(4px)",
-              }}
-            >
-              ${movie.price}
-            </div>
-            <button
-              style={{
-                position: "absolute",
-                bottom: "12px",
-                right: "12px",
-                backgroundColor: "rgba(255, 255, 255, 0.25)",
-                border: "1px solid rgba(255, 255, 255, 0.4)",
-                padding: "8px 16px",
-                borderRadius: "6px",
-                fontWeight: "bold",
-                color: "#fff",
-                fontSize: "0.9rem",
-                backdropFilter: "blur(4px)",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = "rgba(255, 255, 255, 0.4)";
-                e.target.style.transform = "scale(1.05)";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = "rgba(255, 255, 255, 0.25)";
-                e.target.style.transform = "scale(1)";
-              }}
-              onClick={(e) => addToWishlist(e, movie)}
-            >
-              Add to wishlist
-            </button>
+            ${movie.price}
           </div>
-        ))}
-      </div>
-    );
-  };
+          <button
+            style={{
+              position: "absolute",
+              bottom: "10px",
+              right: "10px",
+              backgroundColor: "rgba(0,0,0,0.5)",
+              color: "#fff",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              fontWeight: "bold",
+              fontSize: "0.8rem",
+              cursor: "pointer",
+              border: "none",
+            }}
+            onClick={(e) => addToWishlist(e, movie)}
+          >
+            Add to wishlist
+          </button>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div>
       <ToastContainer position="top-right" autoClose={3000} theme="dark" />
 
-      <div className="container">
-        <div className="row">
-          <div className="col-md-4" style={{ marginTop: "-75px" }}>
-            <div className="glass-box mb-3">
-              <p className="m-0 text-white">Hello {username}</p>
-            </div>
-          </div>
-        </div>
+      {/* Header */}
+      <div
+        className="container"
+        style={{ marginTop: "-50px", marginBottom: "60px" }}
+      >
+        <p className="text-white">👋 Hello {username}</p>
       </div>
 
-      <section className="section justify-content-center">
-        <div className="row">
-          <div className="col-9 col-sm-6 col-md-4 m-3">
-            <div
-              className="card"
-              style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-            >
-              <div className="card-body">
-                <form action="">
-                  <label className="d-block">
-                    <input
-                      type="checkbox"
-                      name="genre[]"
-                      className="mb-2"
-                      value="Action"
-                      onChange={handleGenreChange}
-                      checked={selectedGenres.includes("Action")}
-                    />
-                    Action
-                  </label>
-                  <label className="d-block mb-1">
-                    <input
-                      type="checkbox"
-                      name="genre[]"
-                      value="Drama"
-                      onChange={handleGenreChange}
-                      checked={selectedGenres.includes("Drama")}
-                    />
-                    Drama
-                  </label>
-                  <label className="d-block">
-                    <input
-                      type="checkbox"
-                      name="genre[]"
-                      value="Horror"
-                      onChange={handleGenreChange}
-                      checked={selectedGenres.includes("Horror")}
-                    />
-                    Horror
-                  </label>
-                  <button
-                    className="btn btn-info btn-sm float-end"
-                    onClick={handleFilter}
-                    type="button"
-                  >
-                    <i className="fa fa-filter"></i> Filter
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-12 text-center justify-content-center">
-            <p
-              style={{
-                fontSize: "1rem",
-                width: "85%",
-                maxWidth: "800px",
-                color: "grey",
-                fontFamily: "'Orbitron', sans-serif",
-                textAlign: "right",
-                lineHeight: "1.6",
-                marginLeft: "auto",
-                marginRight: "0",
-                paddingRight: "20px",
-                textShadow: "0 0 6px rgba(255, 255, 255, 0.2)",
-                letterSpacing: "0.4px",
-              }}
-            >
-              Discover and book a ticket for your <br /> next favorite movie.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section
-        style={{
-          paddingTop: "40px",
-          paddingBottom: "40px",
-          paddingRight: "20px",
-          overflowX: "auto",
-        }}
+      {/* Filter */}
+      <div
+        className="container mt-2 p-3 rounded"
+        style={{ backgroundColor: "rgba(255,255,255,0.05)" }}
       >
-        <div
-          style={{
-            maxWidth: "1600px",
-            margin: "0 auto",
-          }}
-        >
-          <p
-            style={{
-              textAlign: "center",
-              fontWeight: "bold",
-              fontFamily: "'Orbitron', sans-serif",
-              fontSize: "28px",
-              marginBottom: "30px",
-              background: "linear-gradient(90deg, #d4af37, #6c757d)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              textShadow: "0 0 6px rgba(0, 0, 0, 0.1)",
-            }}
+        <form>
+          {["Action", "Drama", "Horror"].map((genre) => (
+            <label key={genre} style={{ marginRight: "12px", color: "#fff" }}>
+              <input
+                type="checkbox"
+                value={genre}
+                checked={selectedGenres.includes(genre)}
+                onChange={handleGenreChange}
+              />{" "}
+              {genre}
+            </label>
+          ))}
+          <button
+            type="button"
+            className="btn btn-info btn-sm ms-2"
+            onClick={handleFilter}
           >
-            Coming soon
-          </p>
+            Filter
+          </button>
+        </form>
+      </div>
 
-          <div
-            style={{
-              display: "flex",
-              gap: "24px",
-              flexWrap: "nowrap",
-              paddingLeft: "clamp(16px, 6vw, 0px)",
-              overflowX: "auto",
-              whiteSpace: "nowrap",
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
-            className="hide-scrollbar"
-          >
-            {(() => {
-              let combined = [...filteredMovies];
-
-              if (combined.length < 3) {
-                const needed = 3 - combined.length;
-                const additional = filteredMoreMovies
-                  .filter(
-                    (movie) => !combined.some((m) => m.title === movie.title)
-                  )
-                  .slice(0, needed);
-                combined = combined.concat(additional);
-              }
-
-              return combined.map((movie) => (
-                <div
-                  key={movie.title}
-                  style={{
-                    position: "relative",
-                    width: "clamp(260px, 30vw, 600px)",
-                    height: "300px",
-                    borderRadius: "16px",
-                    overflow: "hidden",
-                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                    flex: "0 0 auto",
-                  }}
-                >
-                  <img
-                    src={movie.img}
-                    alt={movie.title}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      display: "block",
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "12px",
-                      left: "12px",
-                      backgroundColor: "rgba(255, 255, 255, 0.25)",
-                      border: "1px solid rgba(255, 255, 255, 0.4)",
-                      color: "#fff",
-                      padding: "8px 14px",
-                      borderRadius: "6px",
-                      fontWeight: "bold",
-                      fontSize: "1rem",
-                      backdropFilter: "blur(4px)",
-                      textShadow: "0 0 6px rgba(0, 0, 0, 0.4)",
-                    }}
-                  >
-                    ${movie.price}
-                  </div>
-                  <button
-                    style={{
-                      position: "absolute",
-                      bottom: "12px",
-                      right: "12px",
-                      backgroundColor: "rgba(255, 255, 255, 0.25)",
-                      border: "1px solid rgba(255, 255, 255, 0.4)",
-                      padding: "8px 16px",
-                      borderRadius: "6px",
-                      fontWeight: "bold",
-                      color: "#fff",
-                      fontSize: "0.9rem",
-                      backdropFilter: "blur(4px)",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor =
-                        "rgba(255, 255, 255, 0.4)";
-                      e.target.style.transform = "scale(1.05)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor =
-                        "rgba(255, 255, 255, 0.25)";
-                      e.target.style.transform = "scale(1)";
-                    }}
-                    onClick={(e) => addToWishlist(e, movie)}
-                  >
-                    Add to wishlist
-                  </button>
-                </div>
-              ));
-            })()}
-          </div>
-        </div>
-      </section>
+      {/* Movies */}
+      <section className="mt-4">{renderMoviesRow(filteredMovies)}</section>
       {showMore && (
-        <section
-          style={{
-            paddingTop: "20px",
-            paddingBottom: "40px",
-            paddingRight: "20px",
-            overflowX: "auto",
-          }}
-        >
-          <div style={{ maxWidth: "1600px", margin: "0 auto" }}>
-            {renderMoviesRow(filteredMoreMovies)}
-          </div>
+        <section className="mt-4">
+          {renderMoviesRow(filteredMoreMovies)}
         </section>
       )}
 
+      {/* Show More */}
       <div className="text-center mt-3">
         <button
-          onClick={() => setShowMore(!showMore)}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "1rem",
-            color: "rgba(255, 255, 255, 0.5)",
-            textShadow: "0 0 6px rgba(255, 255, 255, 0.6)",
-            transition: "transform 0.3s ease",
-          }}
-          onMouseEnter={(e) => (e.target.style.transform = "scale(1.2)")}
-          onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
-          aria-label={showMore ? "Hide more movies" : "Show more movies"}
+          onClick={() => setShowMore((prev) => !prev)}
+          className="btn btn-outline-light"
         >
-          {showMore ? "▲" : "▼"}
+          {showMore ? "Show Less" : "Show More"}
         </button>
       </div>
 
-      <section className="mb-4 mt-2">
-        <div className="container mt-3">
-          <div className="row justify-content-center">
-            <div className="col-md-4 d-flex justify-content-center">
-              <button
-                className="mb-3"
-                onClick={handleViewList}
-                style={{
-                  background: "linear-gradient(90deg, #28a745, #6c757d)",
-                  padding: "0.6rem 1.5rem",
-                  fontWeight: "bold",
-                  borderRadius: "8px",
-                  width: "100%",
-                  maxWidth: "250px",
-                }}
-              >
-                View wishlists
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* View Wishlist */}
+      <div className="text-center mt-4 mb-5">
+        <button
+          onClick={handleViewList}
+          className="btn btn-success"
+          style={{
+            background: "linear-gradient(90deg, #28a745, #6c757d)",
+            padding: "0.6rem 1.5rem",
+            fontWeight: "bold",
+            borderRadius: "8px",
+            width: "100%",
+            maxWidth: "250px",
+          }}
+        >
+          View Wishlist
+        </button>
+      </div>
     </div>
   );
 };
