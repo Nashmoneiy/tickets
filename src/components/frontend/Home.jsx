@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import img3 from "../images/img3.jpg";
 import img2 from "../images/img2.jpg";
 import img4 from "../images/img4.jpg";
+import img5 from "../images/img5.jpg";
+import img6 from "../images/img6.jpg";
+import img7 from "../images/img7.jpg";
+import img8 from "../images/img8.jpg";
 import AxiosInstance from "../../AxiosInstance";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,10 +16,13 @@ import { useLocation } from "react-router-dom";
 
 const Home = () => {
   const [selectedGenres, setSelectedGenres] = useState([]);
+  const [showMore, setShowMore] = useState(false);
+
   const location = useLocation();
   const [username, setUsername] = useState("");
   const [params] = useSearchParams();
   const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
   const handleGenreChange = (e) => {
     const { value, checked } = e.target;
@@ -30,14 +37,23 @@ const Home = () => {
     e.preventDefault();
 
     if (selectedGenres.length === 0) {
-      // If no filters selected, show all movies
       setFilteredMovies(movies);
+      setFilteredMoreMovies(moreMovies);
     } else {
       const filtered = movies.filter((movie) =>
         movie.genres.some((genre) => selectedGenres.includes(genre))
       );
 
+      const filteredTitles = new Set(filtered.map((m) => m.title));
+
+      const filteredMore = moreMovies.filter(
+        (movie) =>
+          movie.genres.some((genre) => selectedGenres.includes(genre)) &&
+          !filteredTitles.has(movie.title)
+      );
+
       setFilteredMovies(filtered);
+      setFilteredMoreMovies(filteredMore);
     }
   };
 
@@ -61,13 +77,49 @@ const Home = () => {
     {
       img: img4,
       price: "180",
-      title: "Movie Three",
+      title: "Movie Four",
+      date: "20th Friday, August 2025",
+      time: "1:30pm",
+      genres: ["Drama", "Action"],
+    },
+    {
+      img: img5,
+      price: "180",
+      title: "Movie Five",
       date: "20th Friday, August 2025",
       time: "1:30pm",
       genres: ["Drama", "Action"],
     },
   ];
+  const moreMovies = [
+    {
+      img: img6,
+      price: "300",
+      title: "Movie Six",
+      date: "25th Monday, August 2025",
+      time: "3:00pm",
+      genres: ["Action"],
+    },
+
+    {
+      img: img8,
+      price: "230",
+      title: "Movie Eight",
+      date: "28th Thursday, August 2025",
+      time: "5:00pm",
+      genres: ["Action"],
+    },
+    {
+      img: img7,
+      price: "250",
+      title: "Movie Seven",
+      date: "28th Thursday, August 2025",
+      time: "5:00pm",
+      genres: ["Drama", "Horror"],
+    },
+  ];
   const [filteredMovies, setFilteredMovies] = useState(movies);
+  const [filteredMoreMovies, setFilteredMoreMovies] = useState(moreMovies);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -152,6 +204,95 @@ const Home = () => {
       </div>
     );
   }
+  const renderMoviesRow = (moviesArray) => {
+    // Exclude movies already in the first row
+    const displayedTitles = filteredMovies.map((movie) => movie.title);
+    const uniqueMovies = moviesArray.filter(
+      (movie) => !displayedTitles.includes(movie.title)
+    );
+
+    return (
+      <div
+        style={{
+          display: "flex",
+          gap: "24px",
+          flexWrap: "nowrap",
+          paddingLeft: "clamp(16px, 6vw, 0px)",
+          overflowX: "auto",
+          whiteSpace: "nowrap",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+        className="hide-scrollbar"
+      >
+        {uniqueMovies.map((movie) => (
+          <div
+            key={movie.title}
+            style={{
+              position: "relative",
+              width: "clamp(260px, 30vw, 600px)",
+              height: "300px",
+              borderRadius: "16px",
+              overflow: "hidden",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+              flex: "0 0 auto",
+            }}
+          >
+            <img
+              src={movie.img}
+              alt={movie.title}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                top: "12px",
+                left: "12px",
+                backgroundColor: "rgba(255, 255, 255, 0.25)",
+                border: "1px solid rgba(255, 255, 255, 0.4)",
+                color: "#fff",
+                padding: "8px 14px",
+                borderRadius: "6px",
+                fontWeight: "bold",
+                fontSize: "1rem",
+                backdropFilter: "blur(4px)",
+              }}
+            >
+              ${movie.price}
+            </div>
+            <button
+              style={{
+                position: "absolute",
+                bottom: "12px",
+                right: "12px",
+                backgroundColor: "rgba(255, 255, 255, 0.25)",
+                border: "1px solid rgba(255, 255, 255, 0.4)",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                fontWeight: "bold",
+                color: "#fff",
+                fontSize: "0.9rem",
+                backdropFilter: "blur(4px)",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "rgba(255, 255, 255, 0.4)";
+                e.target.style.transform = "scale(1.05)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "rgba(255, 255, 255, 0.25)";
+                e.target.style.transform = "scale(1)";
+              }}
+              onClick={(e) => addToWishlist(e, movie)}
+            >
+              Add to wishlist
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -284,86 +425,133 @@ const Home = () => {
             }}
             className="hide-scrollbar"
           >
-            {filteredMovies.map((movie) => (
-              <div
-                key={movie.title}
-                style={{
-                  position: "relative",
-                  width: "clamp(260px, 30vw, 600px)",
-                  height: "300px",
-                  borderRadius: "16px",
-                  overflow: "hidden",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                  flex: "0 0 auto",
-                }}
-              >
-                <img
-                  src={movie.img}
-                  alt={movie.title}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
+            {(() => {
+              let combined = [...filteredMovies];
 
+              if (combined.length < 3) {
+                const needed = 3 - combined.length;
+                const additional = filteredMoreMovies
+                  .filter(
+                    (movie) => !combined.some((m) => m.title === movie.title)
+                  )
+                  .slice(0, needed);
+                combined = combined.concat(additional);
+              }
+
+              return combined.map((movie) => (
                 <div
+                  key={movie.title}
                   style={{
-                    position: "absolute",
-                    top: "12px",
-                    left: "12px",
-                    backgroundColor: "rgba(255, 255, 255, 0.25)",
-                    border: "1px solid rgba(255, 255, 255, 0.4)",
-                    color: "#fff",
-                    padding: "8px 14px",
-                    borderRadius: "6px",
-                    fontWeight: "bold",
-                    fontSize: "1rem",
-                    backdropFilter: "blur(4px)",
-                    textShadow: "0 0 6px rgba(0, 0, 0, 0.4)",
+                    position: "relative",
+                    width: "clamp(260px, 30vw, 600px)",
+                    height: "300px",
+                    borderRadius: "16px",
+                    overflow: "hidden",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                    flex: "0 0 auto",
                   }}
                 >
-                  ${movie.price}
+                  <img
+                    src={movie.img}
+                    alt={movie.title}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "12px",
+                      left: "12px",
+                      backgroundColor: "rgba(255, 255, 255, 0.25)",
+                      border: "1px solid rgba(255, 255, 255, 0.4)",
+                      color: "#fff",
+                      padding: "8px 14px",
+                      borderRadius: "6px",
+                      fontWeight: "bold",
+                      fontSize: "1rem",
+                      backdropFilter: "blur(4px)",
+                      textShadow: "0 0 6px rgba(0, 0, 0, 0.4)",
+                    }}
+                  >
+                    ${movie.price}
+                  </div>
+                  <button
+                    style={{
+                      position: "absolute",
+                      bottom: "12px",
+                      right: "12px",
+                      backgroundColor: "rgba(255, 255, 255, 0.25)",
+                      border: "1px solid rgba(255, 255, 255, 0.4)",
+                      padding: "8px 16px",
+                      borderRadius: "6px",
+                      fontWeight: "bold",
+                      color: "#fff",
+                      fontSize: "0.9rem",
+                      backdropFilter: "blur(4px)",
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor =
+                        "rgba(255, 255, 255, 0.4)";
+                      e.target.style.transform = "scale(1.05)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor =
+                        "rgba(255, 255, 255, 0.25)";
+                      e.target.style.transform = "scale(1)";
+                    }}
+                    onClick={(e) => addToWishlist(e, movie)}
+                  >
+                    Add to wishlist
+                  </button>
                 </div>
-
-                <button
-                  style={{
-                    position: "absolute",
-                    bottom: "12px",
-                    right: "12px",
-                    backgroundColor: "rgba(255, 255, 255, 0.25)",
-                    border: "1px solid rgba(255, 255, 255, 0.4)",
-                    padding: "8px 16px",
-                    borderRadius: "6px",
-                    fontWeight: "bold",
-                    color: "#fff",
-                    fontSize: "0.9rem",
-                    backdropFilter: "blur(4px)",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = "rgba(255, 255, 255, 0.4)";
-                    e.target.style.transform = "scale(1.05)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor =
-                      "rgba(255, 255, 255, 0.25)";
-                    e.target.style.transform = "scale(1)";
-                  }}
-                  onClick={(e) => addToWishlist(e, movie)}
-                >
-                  Add to wishlist
-                </button>
-              </div>
-            ))}
+              ));
+            })()}
           </div>
         </div>
       </section>
+      {showMore && (
+        <section
+          style={{
+            paddingTop: "20px",
+            paddingBottom: "40px",
+            paddingRight: "20px",
+            overflowX: "auto",
+          }}
+        >
+          <div style={{ maxWidth: "1600px", margin: "0 auto" }}>
+            {renderMoviesRow(filteredMoreMovies)}
+          </div>
+        </section>
+      )}
 
-      <section className="mb-4">
-        <div className="container mt-1">
+      <div className="text-center mt-3">
+        <button
+          onClick={() => setShowMore(!showMore)}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "1rem",
+            color: "rgba(255, 255, 255, 0.5)",
+            textShadow: "0 0 6px rgba(255, 255, 255, 0.6)",
+            transition: "transform 0.3s ease",
+          }}
+          onMouseEnter={(e) => (e.target.style.transform = "scale(1.2)")}
+          onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
+          aria-label={showMore ? "Hide more movies" : "Show more movies"}
+        >
+          {showMore ? "▲" : "▼"}
+        </button>
+      </div>
+
+      <section className="mb-4 mt-2">
+        <div className="container mt-3">
           <div className="row justify-content-center">
             <div className="col-md-4 d-flex justify-content-center">
               <button
@@ -378,7 +566,7 @@ const Home = () => {
                   maxWidth: "250px",
                 }}
               >
-                View Lists
+                View wishlists
               </button>
             </div>
           </div>

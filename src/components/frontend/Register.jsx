@@ -7,7 +7,6 @@ import { Eye, EyeOff } from "lucide-react";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
-
   const togglePassword = () => {
     setShowPassword((prev) => !prev);
   };
