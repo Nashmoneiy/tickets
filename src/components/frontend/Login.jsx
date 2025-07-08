@@ -50,12 +50,11 @@ const Login = () => {
     };
 
     axios
-      .post(`https://ticket-api-production-3c8e.up.railway.app/api/login`, data)
+      .post(`https://ticket-api-production-df9a.up.railway.app/api/login`, data)
       .then((response) => {
         if (response.status === 200) {
           const now = new Date().getTime(); // current time in ms
           const expiryTime = now + 40 * 60 * 1000; // 20 minutes from now
-
           localStorage.setItem("auth_token", response.data.token);
           localStorage.setItem("role", response.data.role);
           localStorage.setItem("auth_token_expiry", expiryTime); // new line

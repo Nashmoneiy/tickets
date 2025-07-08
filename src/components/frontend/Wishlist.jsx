@@ -99,7 +99,7 @@ const Wishlist = () => {
       })),
     };
     AxiosInstance.post(
-      `https://ticket-api-production-3c8e.up.railway.app/api/checkout`,
+      `https://ticket-api-production-df9a.up.railway.app/api/checkout`,
       data
     )
       .then((response) => {

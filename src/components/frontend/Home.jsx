@@ -239,7 +239,7 @@ const Home = () => {
         className="container"
         style={{ marginTop: "-50px", marginBottom: "60px" }}
       >
-        <p className="text-white">👋 Hello {username}</p>
+        <p className="text-white">👋Hello {username}</p>
       </div>
 
       {/* Filter */}

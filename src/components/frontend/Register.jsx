@@ -48,7 +48,7 @@ const Register = () => {
 
     axios
       .post(
-        `https://ticket-api-production-3c8e.up.railway.app/api/register`,
+        `https://ticket-api-production-df9a.up.railway.app/api/register`,
         data
       )
       .then((response) => {
